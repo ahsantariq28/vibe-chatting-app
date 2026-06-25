@@ -8,6 +8,7 @@ import { useMessages } from "@/hooks/useMessages";
 import PresenceIndicator from "./PresenceIndicator";
 import { usePresence } from "@/hooks/usePresence";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface ChatWindowProps {
   conversation: IConversation;
@@ -19,6 +20,7 @@ export default function ChatWindow({
   initialMessages,
 }: ChatWindowProps) {
   const { data: session } = useSession();
+  const router = useRouter();
   const conversationId = conversation._id.toString();
   const { messages, setMessages, typingUsers } = useMessages(conversationId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,26 @@ export default function ChatWindow({
   return (
     <div className="flex-1 flex flex-col h-screen bg-slate-900">
       <div className="p-4 border-b border-slate-700 bg-slate-800 flex items-center gap-3">
+        <button
+          onClick={() => router.push("/chat")}
+          className="p-1.5 text-slate-400 hover:text-white md:hidden transition-colors rounded-lg hover:bg-slate-700 mr-1"
+          title="Back to conversations"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5L8.25 12l7.5-7.5"
+            />
+          </svg>
+        </button>
         <div className="relative">
           {conversation.isGroup ? (
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">

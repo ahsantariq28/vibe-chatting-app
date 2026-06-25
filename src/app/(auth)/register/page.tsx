@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import Loader from "@/components/Loader";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -82,9 +83,16 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading ? "Registering..." : "Register"}
+            {loading ? (
+              <>
+                <Loader size="xs" color="white" />
+                <span>Registering...</span>
+              </>
+            ) : (
+              "Register"
+            )}
           </button>
         </form>
         <p className="text-center mt-6 text-slate-400">

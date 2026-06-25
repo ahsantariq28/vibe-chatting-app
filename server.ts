@@ -9,31 +9,12 @@ import { Server } from "socket.io";
 
 const hostname = "localhost";
 const port = parseInt(process.env.PORT || "3000", 10);
-const app = next({ dev, hostname, port });
-const handle = app.getRequestHandler();
+const isSocketOnly = process.env.SOCKET_ONLY === "true";
 
 const onlineUsers = new Map<string, string>();
 const userSockets = new Map<string, string[]>();
 
-app.prepare().then(() => {
-  const server = createServer(async (req, res) => {
-    try {
-      const parsedUrl = parse(req.url!, true);
-      await handle(req, res, parsedUrl);
-    } catch (err) {
-      console.error("Error occurred handling", req.url, err);
-      res.statusCode = 500;
-      res.end("internal server error");
-    }
-  });
-
-  const io = new Server(server, {
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST"],
-    },
-  });
-
+function setupSockets(io: Server) {
   io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
 
@@ -80,7 +61,6 @@ app.prepare().then(() => {
     socket.on("typing_start", (data) => {
       socket.to(data.conversationId).emit("typing_start", data);
     });
-
     socket.on("typing_stop", (data) => {
       socket.to(data.conversationId).emit("typing_stop", data);
     });
@@ -119,8 +99,54 @@ app.prepare().then(() => {
       }
     });
   });
+}
+
+if (isSocketOnly) {
+  const server = createServer((req, res) => {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/plain");
+    res.end("Vibe Chat Socket Server is running.");
+  });
+
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+  });
+
+  setupSockets(io);
 
   server.listen(port, () => {
-    console.log(`> Ready on http://${hostname}:${port}`);
+    console.log(`> Socket server listening on port ${port}`);
   });
-});
+} else {
+  const app = next({ dev, hostname, port });
+  const handle = app.getRequestHandler();
+
+  app.prepare().then(() => {
+    const server = createServer(async (req, res) => {
+      try {
+        const parsedUrl = parse(req.url!, true);
+        await handle(req, res, parsedUrl);
+      } catch (err) {
+        console.error("Error occurred handling", req.url, err);
+        res.statusCode = 500;
+        res.end("internal server error");
+      }
+    });
+
+    const io = new Server(server, {
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+      },
+    });
+
+    setupSockets(io);
+
+    server.listen(port, () => {
+      console.log(`> Ready on http://${hostname}:${port}`);
+    });
+  });
+}

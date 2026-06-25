@@ -2,8 +2,14 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import connectToDB from "@/lib/mongodb";
 import Conversation from "@/models/Conversation";
+import SocketProvider from "@/providers/SocketProvider";
+import ResponsiveChatLayout from "@/components/ResponsiveChatLayout";
 
-export default async function ChatPage() {
+export default async function ChatLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const session = await auth();
   if (!session) redirect("/login");
 
@@ -18,20 +24,11 @@ export default async function ChatPage() {
 
   const plainConversations = JSON.parse(JSON.stringify(conversations));
 
-  if (conversations.length > 0) {
-    redirect(`/chat/${conversations[0]._id}`);
-  }
-
   return (
-    <div className="flex-1 flex items-center justify-center bg-slate-900">
-      <div className="text-center">
-        <h2 className="text-2xl font-semibold text-white mb-2">
-          Welcome to Vibe Chat!
-        </h2>
-        <p className="text-slate-400">
-          Search for a user to start a conversation
-        </p>
-      </div>
-    </div>
+    <SocketProvider>
+      <ResponsiveChatLayout conversations={plainConversations as any}>
+        {children}
+      </ResponsiveChatLayout>
+    </SocketProvider>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { IUser } from "@/types";
 import toast from "react-hot-toast";
+import Loader from "./Loader";
 
 interface UserSearchProps {
   onUserSelect: (user: IUser) => void;
@@ -12,16 +13,25 @@ export default function UserSearch({ onUserSelect }: UserSearchProps) {
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<IUser[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
       if (search.trim()) {
-        const res = await fetch(`/api/users?search=${search}`);
-        const data = await res.json();
-        setUsers(data);
-        setIsOpen(true);
+        setLoading(true);
+        try {
+          const res = await fetch(`/api/users?search=${search}`);
+          const data = await res.json();
+          setUsers(data);
+          setIsOpen(true);
+        } catch (error) {
+          console.error("Failed to fetch users:", error);
+        } finally {
+          setLoading(false);
+        }
       } else {
         setIsOpen(false);
+        setUsers([]);
       }
     };
     fetchUsers();
@@ -54,8 +64,13 @@ export default function UserSearch({ onUserSelect }: UserSearchProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search users..."
-          className="w-full px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+          className="w-full pl-4 pr-10 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:outline-none focus:border-blue-500"
         />
+        {loading && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <Loader size="xs" color="blue" />
+          </div>
+        )}
         {isOpen && users.length > 0 && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
             {users.map((user) => (

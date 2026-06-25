@@ -35,3 +35,7 @@ lerna-debug.log*
 # Misc
 *.tsbuildinfo
 .cache/
+
+# Playwright reports and test results
+playwright-report/
+test-results/

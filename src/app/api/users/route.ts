@@ -14,13 +14,18 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
 
+    // Escape regex special characters to prevent ReDoS
+    const escapedSearch = search.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
+
     const users = await User.find({
       _id: { $ne: session.user!.id },
       $or: [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { name: { $regex: escapedSearch, $options: "i" } },
+        { email: { $regex: escapedSearch, $options: "i" } },
       ],
-    }).select("-password");
+    })
+      .select("-password")
+      .limit(15);
 
     return NextResponse.json(users);
   } catch (error) {

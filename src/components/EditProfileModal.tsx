@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import Loader from "./Loader";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -214,9 +215,16 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg transition-colors shadow-md shadow-blue-900/30"
+              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg transition-colors shadow-md shadow-blue-900/30 flex items-center gap-2"
             >
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? (
+                <>
+                  <Loader size="xs" color="white" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                "Save Changes"
+              )}
             </button>
           </div>
         </form>

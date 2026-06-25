@@ -4,7 +4,8 @@ let socket: Socket | null = null;
 
 export const getSocket = (): Socket => {
   if (!socket) {
-    socket = io();
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
+    socket = socketUrl ? io(socketUrl) : io();
   } else if (socket.disconnected) {
     socket.connect();
   }
