@@ -41,12 +41,13 @@ export default function ChatWindow({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingUsers]);
 
-  const handleMessageSent = (text: string) => {
+  const handleMessageSent = (text: string, image?: string) => {
     // Optimistic update: create a temporary message and add it to the state
     if (session?.user) {
       const tempMessage: any = {
         _id: "temp-" + Date.now().toString(), // Temporary ID with prefix
         text,
+        image,
         sender: session.user,
         conversation: conversationId,
         readBy: [session.user],
@@ -118,7 +119,17 @@ export default function ChatWindow({
 
       <div className="flex-1 overflow-y-auto p-4">
         {messages.map((message) => (
-          <MessageBubble key={message._id.toString()} message={message} />
+          <MessageBubble
+            key={message._id.toString()}
+            message={message}
+            onDelete={(messageId) => {
+              setMessages((prev) =>
+                prev.filter((m) => m._id.toString() !== messageId),
+              );
+              // Refresh to update conversation list with new last message
+              router.refresh();
+            }}
+          />
         ))}
         {typingUsers.length > 0 && (
           <div className="flex justify-start mb-4">

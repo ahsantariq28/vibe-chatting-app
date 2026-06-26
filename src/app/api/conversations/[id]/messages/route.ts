@@ -78,12 +78,13 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { text } = body;
+    const { text, image } = body;
 
     const newMessage = new Message({
       conversation: params.id,
       sender: session.user!.id,
       text,
+      image,
       readBy: [session.user!.id],
     });
 
@@ -92,7 +93,7 @@ export async function POST(
 
     await Conversation.findByIdAndUpdate(params.id, {
       lastMessage: {
-        text,
+        text: image ? "📷 Image" : text,
         sender: session.user!.id,
         timestamp: new Date(),
       },

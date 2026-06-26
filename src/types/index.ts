@@ -31,6 +31,7 @@ export interface IMessage {
   conversation: string | Types.ObjectId;
   sender: IUser;
   text: string;
+  image?: string;
   readBy: IUser[];
   createdAt: Date;
   isTemp?: boolean;

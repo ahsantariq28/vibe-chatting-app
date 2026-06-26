@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { clearDatabase, disconnectDatabase } from "./helpers/db";
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ context }) => {
   await clearDatabase();
+  await context.clearCookies();
 });
 
 test.afterAll(async () => {
@@ -29,6 +30,9 @@ test.describe("User Authentication", () => {
     await page.fill('input[type="password"]', "password123");
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL("/login", { timeout: 15000 });
+
+    // Force a fresh navigation to ensure cookies are fully set and synchronized
+    await page.goto("/login");
 
     // Login with credentials
     await page.fill('input[type="email"]', "test@example.com");

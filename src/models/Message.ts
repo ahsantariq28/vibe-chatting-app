@@ -17,7 +17,10 @@ const MessageSchema: Schema = new Schema(
     },
     text: {
       type: String,
-      required: true,
+      default: "",
+    },
+    image: {
+      type: String,
     },
     readBy: [
       {

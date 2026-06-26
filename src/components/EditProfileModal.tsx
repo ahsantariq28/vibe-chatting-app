@@ -13,7 +13,7 @@ interface EditProfileModalProps {
 const PRESET_AVATARS = [
   // 1. Aurora Breeze (Cyan to Blue Gradient)
   `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2306b6d4"/><stop offset="100%" stop-color="%233b82f6"/></linearGradient></defs><rect width="100" height="100" fill="url(%23g1)"/><circle cx="50" cy="50" r="25" fill="%23ffffff" opacity="0.25"/><circle cx="30" cy="70" r="15" fill="%23ffffff" opacity="0.15"/><circle cx="70" cy="30" r="10" fill="%23ffffff" opacity="0.2"/></svg>`,
-  
+
   // 2. Sunset Vibe (Pink to Orange Gradient)
   `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23ec4899"/><stop offset="100%" stop-color="%23f97316"/></linearGradient></defs><rect width="100" height="100" fill="url(%23g2)"/><circle cx="50" cy="50" r="30" fill="%23ffffff" opacity="0.2"/><path d="M20,80 Q50,40 80,80" fill="none" stroke="%23ffffff" stroke-width="4" opacity="0.3"/></svg>`,
 
@@ -27,10 +27,13 @@ const PRESET_AVATARS = [
   `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23ef4444"/><stop offset="100%" stop-color="%23eab308"/></linearGradient></defs><rect width="100" height="100" fill="url(%23g5)"/><circle cx="35" cy="40" r="8" fill="%23ffffff" opacity="0.3"/><circle cx="65" cy="40" r="8" fill="%23ffffff" opacity="0.3"/><path d="M 30 65 Q 50 80 70 65" fill="none" stroke="%23ffffff" stroke-width="5" stroke-linecap="round" opacity="0.4"/></svg>`,
 
   // 6. Midnight Spark (Slate to Violet Gradient)
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g6" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231e293b"/><stop offset="100%" stop-color="%237c3aed"/></linearGradient></defs><rect width="100" height="100" fill="url(%23g6)"/><path d="M50,15 L62,38 L88,42 L68,60 L73,85 L50,72 L27,85 L32,60 L12,42 L38,38 Z" fill="%23ffffff" opacity="0.25"/></svg>`
+  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g6" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231e293b"/><stop offset="100%" stop-color="%237c3aed"/></linearGradient></defs><rect width="100" height="100" fill="url(%23g6)"/><path d="M50,15 L62,38 L88,42 L68,60 L73,85 L50,72 L27,85 L32,60 L12,42 L38,38 Z" fill="%23ffffff" opacity="0.25"/></svg>`,
 ];
 
-export default function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
+export default function EditProfileModal({
+  isOpen,
+  onClose,
+}: EditProfileModalProps) {
   const { data: session, update } = useSession();
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
@@ -62,15 +65,15 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         const maxDimension = 150;
-        
+
         canvas.width = maxDimension;
         canvas.height = maxDimension;
-        
+
         if (ctx) {
           const minSide = Math.min(img.width, img.height);
           const sx = (img.width - minSide) / 2;
           const sy = (img.height - minSide) / 2;
-          
+
           ctx.drawImage(
             img,
             sx,
@@ -80,14 +83,20 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
             0,
             0,
             maxDimension,
-            maxDimension
+            maxDimension,
           );
-          
+
           const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
           setImage(dataUrl);
         }
       };
+      img.onerror = () => {
+        toast.error("Failed to load image. Please select a valid image file.");
+      };
       img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      toast.error("Error reading file.");
     };
     reader.readAsDataURL(file);
   };
@@ -137,25 +146,55 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
         <form onSubmit={handleSave} className="space-y-6">
           <div className="flex flex-col items-center gap-4">
-            <div className="relative group">
-              {image ? (
-                <img
-                  src={image}
-                  alt="Avatar Preview"
-                  className="w-24 h-24 rounded-full object-cover border-2 border-blue-500 shadow-lg"
-                />
-              ) : (
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-slate-600 shadow-lg">
-                  {name.charAt(0) || "U"}
+            <div className="relative">
+              <div
+                className="relative group cursor-pointer overflow-hidden rounded-full"
+                onClick={() => fileInputRef.current?.click()}
+                title="Upload custom photo"
+              >
+                {image ? (
+                  <img
+                    src={image}
+                    alt="Avatar Preview"
+                    className="w-24 h-24 rounded-full object-cover border-2 border-blue-500 shadow-lg group-hover:opacity-80 transition-opacity"
+                  />
+                ) : (
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-slate-600 shadow-lg group-hover:opacity-80 transition-opacity">
+                    {name.charAt(0) || "U"}
+                  </div>
+                )}
+
+                <div className="absolute inset-0 hidden md:flex items-center justify-center bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-semibold">
+                  Upload Photo
                 </div>
-              )}
-              
+              </div>
+
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute inset-0 flex items-center justify-center bg-slate-900/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-xs font-semibold"
+                className="absolute bottom-0 right-0 p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg transition-colors border-2 border-slate-800 flex items-center justify-center hover:scale-105 active:scale-95 animate-pulse min-h-[44px] min-w-[44px]"
+                style={{ animationDuration: "3s" }}
+                title="Upload custom photo"
               >
-                Upload Photo
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="w-3.5 h-3.5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
+                  />
+                </svg>
               </button>
             </div>
 
@@ -177,11 +216,17 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                     key={index}
                     type="button"
                     onClick={() => setImage(preset)}
-                    className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all hover:scale-110 active:scale-95 ${
-                      image === preset ? "border-blue-500 scale-105" : "border-transparent"
+                    className={`min-h-[44px] min-w-[44px] w-11 h-11 rounded-full overflow-hidden border-2 transition-all hover:scale-110 active:scale-95 flex items-center justify-center ${
+                      image === preset
+                        ? "border-blue-500 scale-105"
+                        : "border-transparent"
                     }`}
                   >
-                    <img src={preset} alt={`Preset ${index + 1}`} className="w-full h-full object-cover" />
+                    <img
+                      src={preset}
+                      alt={`Preset ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -199,7 +244,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
               placeholder="Your display name"
               required
               maxLength={40}
-              className="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors min-h-[44px] text-base"
             />
           </div>
 
@@ -208,14 +253,14 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg transition-colors min-h-[44px]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg transition-colors shadow-md shadow-blue-900/30 flex items-center gap-2"
+              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg transition-colors shadow-md shadow-blue-900/30 flex items-center gap-2 min-h-[44px]"
             >
               {loading ? (
                 <>

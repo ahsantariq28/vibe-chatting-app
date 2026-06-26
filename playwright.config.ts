@@ -17,6 +17,10 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "Mobile Chrome",
+      use: { ...devices["Pixel 5"] },
+    },
   ],
   webServer: {
     command: "npx tsx server.ts",
@@ -26,7 +30,9 @@ export default defineConfig({
     env: {
       MONGODB_URI: "mongodb://localhost:27017/chatapp_test",
       NEXTAUTH_SECRET: "test-secret-key-for-nextauth-testing-123456",
+      AUTH_SECRET: "test-secret-key-for-nextauth-testing-123456",
       NEXTAUTH_URL: "http://localhost:3001",
+      AUTH_TRUST_HOST: "true",
       PORT: "3001",
       TEST_ENV: "true",
     },

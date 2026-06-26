@@ -57,14 +57,14 @@ export default function UserSearch({ onUserSelect }: UserSearchProps) {
   };
 
   return (
-    <div className="p-4 border-b border-slate-700">
+    <div className="p-3 sm:p-4 border-b border-slate-700">
       <div className="relative">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search users..."
-          className="w-full pl-4 pr-10 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:outline-none focus:border-blue-500"
+          className="w-full pl-4 pr-10 py-3 rounded-lg bg-slate-700 text-white border border-slate-600 focus:outline-none focus:border-blue-500 min-h-[44px] text-base"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -77,7 +77,7 @@ export default function UserSearch({ onUserSelect }: UserSearchProps) {
               <div
                 key={user._id.toString()}
                 onClick={() => handleUserClick(user)}
-                className="px-4 py-3 hover:bg-slate-700 cursor-pointer flex items-center gap-3"
+                className="px-3 sm:px-4 py-3 hover:bg-slate-700 cursor-pointer flex items-center gap-3 min-h-[56px]"
               >
                 {user.image ? (
                   <img

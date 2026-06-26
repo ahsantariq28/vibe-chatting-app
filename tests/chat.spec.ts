@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { clearDatabase, disconnectDatabase } from "./helpers/db";
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ context }) => {
   await clearDatabase();
+  await context.clearCookies();
 });
 
 test.afterAll(async () => {
@@ -26,6 +27,9 @@ test.describe("Real-time Chat and Sockets", () => {
     await pageA.click('button[type="submit"]');
     await expect(pageA).toHaveURL("/login", { timeout: 15000 });
 
+    // Force a fresh navigation to ensure cookies are fully set and synchronized
+    await pageA.goto("/login");
+
     await pageA.fill('input[type="email"]', "alice@example.com");
     await pageA.fill('input[type="password"]', "password123");
     await pageA.click('button[type="submit"]');
@@ -38,6 +42,9 @@ test.describe("Real-time Chat and Sockets", () => {
     await pageB.fill('input[type="password"]', "password123");
     await pageB.click('button[type="submit"]');
     await expect(pageB).toHaveURL("/login", { timeout: 15000 });
+
+    // Force a fresh navigation to ensure cookies are fully set and synchronized
+    await pageB.goto("/login");
 
     await pageB.fill('input[type="email"]', "bob@example.com");
     await pageB.fill('input[type="password"]', "password123");
@@ -89,7 +96,7 @@ test.describe("Real-time Chat and Sockets", () => {
 
     // 10. Verify offline status
     // Alice logs out
-    await pageA.click('button:has-text("Logout")');
+    await pageA.click('button[title="Logout"]');
     await expect(pageA).toHaveURL("/login", { timeout: 15000 });
 
     // Bob should now see Alice as offline
