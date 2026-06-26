@@ -4,8 +4,11 @@ import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "Vibe Chat",
+  title: "Vibe",
   description: "A real-time chat app",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({

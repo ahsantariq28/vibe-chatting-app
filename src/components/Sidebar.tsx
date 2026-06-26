@@ -6,6 +6,8 @@ import UserSearch from "./UserSearch";
 import ConversationList from "./ConversationList";
 import { signOut, useSession } from "next-auth/react";
 import EditProfileModal from "./EditProfileModal";
+import Image from "next/image";
+import Icon from "@/assets/icon.png";
 
 interface SidebarProps {
   conversations: IConversation[];
@@ -18,7 +20,7 @@ export default function Sidebar({ conversations }: SidebarProps) {
   return (
     <div className="w-full md:w-80 bg-slate-800 border-r border-slate-700 flex flex-col h-screen">
       <div className="p-3 sm:p-4 border-b border-slate-700">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Vibe Chat</h1>
+        <Image src={Icon} alt="Vibe Chat" className="h-8 sm:h-10 w-auto" />
       </div>
       <UserSearch onUserSelect={() => {}} />
       <ConversationList conversations={conversations} />

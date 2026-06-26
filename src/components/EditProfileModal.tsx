@@ -244,7 +244,8 @@ export default function EditProfileModal({
               placeholder="Your display name"
               required
               maxLength={40}
-              className="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors min-h-[44px] text-base"
+              disabled={loading}
+              className="w-full px-4 py-2.5 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors min-h-[44px] text-base disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -253,14 +254,14 @@ export default function EditProfileModal({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg transition-colors min-h-[44px]"
+              className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white bg-slate-700/60 hover:bg-slate-700 border border-slate-600 rounded-lg transition-colors min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg transition-colors shadow-md shadow-blue-900/30 flex items-center gap-2 min-h-[44px]"
+              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 rounded-lg transition-colors shadow-md shadow-blue-900/30 flex items-center gap-2 min-h-[44px] disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>

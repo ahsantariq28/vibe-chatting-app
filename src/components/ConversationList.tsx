@@ -24,21 +24,30 @@ export default function ConversationList({
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {conversations.map((conversation) => {
-        const convId = conversation._id?.toString() || "";
-        const isActive = pathname === `/chat/${convId}`;
+      {conversations.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+          <p className="text-lg text-slate-400 mb-2">No conversations yet</p>
+          <p className="text-sm text-slate-500">
+            Start a new conversation by searching for users above!
+          </p>
+        </div>
+      ) : (
+        conversations.map((conversation) => {
+          const convId = conversation._id?.toString() || "";
+          const isActive = pathname === `/chat/${convId}`;
 
-        return (
-          <ConversationItem
-            key={convId}
-            conversation={conversation}
-            currentUserId={session?.user?.id || ""}
-            isActive={isActive}
-            onClick={() => router.push(`/chat/${convId}`)}
-            mounted={mounted}
-          />
-        );
-      })}
+          return (
+            <ConversationItem
+              key={convId}
+              conversation={conversation}
+              currentUserId={session?.user?.id || ""}
+              isActive={isActive}
+              onClick={() => router.push(`/chat/${convId}`)}
+              mounted={mounted}
+            />
+          );
+        })
+      )}
     </div>
   );
 }
